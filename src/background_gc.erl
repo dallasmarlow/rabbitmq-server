@@ -26,7 +26,7 @@
 
 -define(MAX_RATIO, 0.01).
 -define(IDEAL_INTERVAL, 60000).
--define(MAX_INTERVAL, 240000).
+-define(MAX_INTERVAL, 600000).
 
 -record(state, {last_interval}).
 
@@ -76,7 +76,7 @@ interval_gc(State = #state{last_interval = LastInterval}) ->
     State#state{last_interval = Interval}.
 
 gc() ->
-    [garbage_collect(P) || P <- processes(),
+    [garbage_collect(P) andalso timer:sleep(random:uniform(1000)) || P <- processes(),
                            {status, waiting} == process_info(P, status)],
     garbage_collect(), %% since we will never be waiting...
     ok.
