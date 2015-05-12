@@ -24,9 +24,10 @@
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
          terminate/2, code_change/3]).
 
--define(MAX_RATIO, 0.01).
+-define(MAX_RATIO, 0.02).
 -define(IDEAL_INTERVAL, 60000).
 -define(MAX_INTERVAL, 600000).
+-define(MAX_SLEEP_INTERVAL, 10).
 
 -record(state, {last_interval}).
 
@@ -76,7 +77,7 @@ interval_gc(State = #state{last_interval = LastInterval}) ->
     State#state{last_interval = Interval}.
 
 gc() ->
-    [garbage_collect(P) andalso timer:sleep(random:uniform(1000)) || P <- processes(),
+    [garbage_collect(P) andalso timer:sleep(random:uniform(?MAX_SLEEP_INTERVAL)) || P <- processes(),
                            {status, waiting} == process_info(P, status)],
     garbage_collect(), %% since we will never be waiting...
     ok.
